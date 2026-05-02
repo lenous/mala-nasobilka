@@ -47,7 +47,7 @@ button:disabled {
   width: min(100%, 520px);
   min-height: 100svh;
   margin: 0 auto;
-  padding: 14px;
+  padding: 12px;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(248, 240, 215, 0.76)),
     #f8f0d7;
@@ -55,14 +55,14 @@ button:disabled {
 
 .welcome-screen {
   display: grid;
-  min-height: calc(100svh - 28px);
+  min-height: calc(100svh - 24px);
   align-items: center;
 }
 
 .welcome-card {
   position: relative;
-  min-height: 620px;
-  padding: 24px 20px;
+  min-height: min(560px, calc(100svh - 24px));
+  padding: 20px 18px;
   overflow: hidden;
   border: 3px solid #16213a;
   border-radius: 8px;
@@ -74,13 +74,13 @@ button:disabled {
 
 .orbital-scene {
   position: relative;
-  height: 210px;
-  margin-bottom: 18px;
+  height: 150px;
+  margin-bottom: 14px;
 }
 
 .orbital-scene::before {
   position: absolute;
-  inset: 28px 44px 8px 30px;
+  inset: 16px 54px 4px 28px;
   border: 3px dashed rgba(22, 33, 58, 0.55);
   border-radius: 50%;
   content: "";
@@ -99,32 +99,32 @@ button:disabled {
 }
 
 .planet-main {
-  right: 54px;
-  bottom: 18px;
-  width: 122px;
-  height: 122px;
+  right: 62px;
+  bottom: 12px;
+  width: 98px;
+  height: 98px;
   background: #ffffff;
   color: #7b2cbf;
-  font-size: 4.8rem;
+  font-size: 3.8rem;
 }
 
 .planet-small {
-  top: 10px;
-  left: 38px;
-  width: 74px;
-  height: 74px;
+  top: 8px;
+  left: 42px;
+  width: 58px;
+  height: 58px;
   background: #ffb3c1;
-  font-size: 2.1rem;
+  font-size: 1.8rem;
 }
 
 .planet-tiny {
-  right: 18px;
-  top: 18px;
-  width: 54px;
-  height: 54px;
+  right: 24px;
+  top: 14px;
+  width: 46px;
+  height: 46px;
   background: #00b8a9;
   color: #ffffff;
-  font-size: 1.5rem;
+  font-size: 1.3rem;
 }
 
 .eyebrow {
@@ -145,8 +145,8 @@ p {
 h1 {
   margin-bottom: 10px;
   color: #16213a;
-  font-size: 2.3rem;
-  line-height: 0.98;
+  font-size: 2.08rem;
+  line-height: 1.02;
   letter-spacing: 0;
 }
 
@@ -158,9 +158,9 @@ h2 {
 }
 
 .welcome-copy {
-  margin-bottom: 22px;
+  margin-bottom: 18px;
   color: #24324f;
-  font-size: 1.02rem;
+  font-size: 0.98rem;
   font-weight: 800;
   line-height: 1.35;
 }
@@ -221,7 +221,7 @@ h2 {
 
 .game-board,
 .leaderboard-page {
-  padding: 14px;
+  padding: 12px;
   border: 3px solid #16213a;
   border-radius: 8px;
   background: #ffffff;
@@ -231,13 +231,13 @@ h2 {
 .game-status {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin-bottom: 12px;
+  gap: 7px;
+  margin-bottom: 10px;
 }
 
 .stat-tile {
-  min-height: 68px;
-  padding: 9px 7px;
+  min-height: 62px;
+  padding: 8px 7px;
   border: 2px solid #16213a;
   border-radius: 8px;
   background: #f8f0d7;
@@ -254,7 +254,7 @@ h2 {
 
 .stat-tile strong {
   color: #16213a;
-  font-size: 1.44rem;
+  font-size: 1.34rem;
   line-height: 1;
 }
 
@@ -291,12 +291,11 @@ h2 {
 .problem-card {
   display: grid;
   justify-items: center;
-  min-height: 292px;
-  padding: 22px 12px;
+  min-height: 250px;
+  padding: 18px 12px;
   border-radius: 8px;
   background:
-    radial-gradient(circle at 18% 12%, rgba(255, 209, 102, 0.45), transparent 30%),
-    linear-gradient(135deg, rgba(255, 214, 165, 0.7), rgba(203, 245, 245, 0.8)),
+    linear-gradient(135deg, rgba(255, 214, 165, 0.72), rgba(203, 245, 245, 0.82)),
     #f6f7d7;
 }
 
@@ -312,7 +311,7 @@ h2 {
   align-items: center;
   width: min(100%, 322px);
   color: #16213a;
-  font-size: 4.7rem;
+  font-size: 4.35rem;
   font-weight: 1000;
   line-height: 1;
   text-align: center;
@@ -322,8 +321,8 @@ h2 {
   display: grid;
   place-items: center;
   width: min(100%, 292px);
-  min-height: 56px;
-  margin: 18px 0 0;
+  min-height: 52px;
+  margin: 14px 0 0;
   padding: 8px 12px;
   border: 3px solid #16213a;
   border-radius: 8px;
@@ -352,12 +351,12 @@ h2 {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 76px;
+  min-height: 84px;
   border: 2px solid #16213a;
   border-radius: 8px;
   background: #ffffff;
   color: #16213a;
-  font-size: 1.9rem;
+  font-size: 2.08rem;
   font-weight: 1000;
   box-shadow: 0 5px 0 #16213a;
 }
@@ -367,11 +366,11 @@ h2 {
 }
 
 .answer-options .answer-correct {
-  background: #9ef0c1;
+  background: #78e6aa;
 }
 
 .answer-options .answer-wrong {
-  background: #ff8fa3;
+  background: #ff7b91;
 }
 
 .answer-options .answer-muted {
@@ -582,26 +581,26 @@ h2 {
 
 @media (max-width: 390px) {
   .app-shell {
-    padding: 10px;
+    padding: 8px;
   }
 
   .welcome-card {
-    min-height: calc(100svh - 20px);
-    padding: 20px 16px;
+    min-height: calc(100svh - 16px);
+    padding: 16px 14px;
   }
 
   h1 {
-    font-size: 1.95rem;
+    font-size: 1.72rem;
   }
 
   .planet-main {
-    right: 38px;
-    width: 108px;
-    height: 108px;
+    right: 44px;
+    width: 88px;
+    height: 88px;
   }
 
   .problem {
-    font-size: 3.8rem;
+    font-size: 3.7rem;
   }
 
   .form-row {
