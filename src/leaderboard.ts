@@ -7,6 +7,7 @@ export type LeaderboardEntry = {
   best_streak: number
   correct_answers: number
   wrong_answers: number
+  game_seconds: number
   created_at: string
 }
 
@@ -16,6 +17,7 @@ export type NewLeaderboardEntry = {
   bestStreak: number
   correctAnswers: number
   wrongAnswers: number
+  gameSeconds: number
 }
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string | undefined
@@ -32,7 +34,7 @@ export async function loadLeaderboard(): Promise<LeaderboardEntry[]> {
   const { data, error } = await supabase
     .from('leaderboard_scores')
     .select(
-      'id,nickname,score,best_streak,correct_answers,wrong_answers,created_at',
+      'id,nickname,score,best_streak,correct_answers,wrong_answers,game_seconds,created_at',
     )
     .order('score', { ascending: false })
     .order('best_streak', { ascending: false })
@@ -62,6 +64,7 @@ export async function saveLeaderboardEntry(entry: NewLeaderboardEntry) {
     best_streak: entry.bestStreak,
     correct_answers: entry.correctAnswers,
     wrong_answers: entry.wrongAnswers,
+    game_seconds: entry.gameSeconds,
   })
 
   if (error) {
