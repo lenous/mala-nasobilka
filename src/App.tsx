@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
-import confetti from 'canvas-confetti'
 import {
   ArrowLeft,
   Medal,
@@ -200,7 +199,9 @@ function App() {
     }
   }
 
-  function launchCelebration() {
+  async function launchCelebration() {
+    const { default: confetti } = await import('canvas-confetti')
+
     confetti({
       particleCount: 120,
       spread: 80,
@@ -240,6 +241,10 @@ function App() {
     setLeaderboardError('')
 
     try {
+      if (stats.bestStreak < CELEBRATION_STREAK) {
+        throw new Error('Zápis se odemkne až po 20 správných odpovědích v řadě.')
+      }
+
       await saveLeaderboardEntry({
         nickname,
         score: stats.score,
@@ -352,9 +357,9 @@ function HomeScreen({
           <span className="planet planet-tiny">3</span>
         </div>
         <p className="eyebrow">Malá násobilka</p>
-        <h1 id="welcome-title">Vydej se na misi za 20 správnými výsledky.</h1>
+        <h1 id="welcome-title">Natrénuj násobilku hravě.</h1>
         <p className="welcome-copy">
-          Hra si pamatuje, které příklady jsou lehké, a ty těžší trénuje častěji.
+          Nasbírej 20 správných odpovědí v řadě a zapiš se do tabulky hráčů.
         </p>
         <div className="welcome-actions">
           <button type="button" className="primary-button" onClick={onStartGame}>
