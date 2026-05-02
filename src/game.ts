@@ -7,16 +7,22 @@ export type Problem = {
 
 export type ProblemWeight = Record<string, number>
 
+export type AnswerOptions = {
+  values: number[]
+  correctIndex: number
+}
+
 export type AnswerResult = {
   weights: ProblemWeight
   scoreDelta: number
   feedback: string
+  isCorrect: boolean
 }
 
-const MIN_WEIGHT = 0.35
-const MAX_WEIGHT = 7
-const CORRECT_MULTIPLIER = 0.72
-const WRONG_MULTIPLIER = 1.85
+const MIN_WEIGHT = 0.3
+const MAX_WEIGHT = 9
+const FAST_SECONDS = 4
+const SLOW_SECONDS = 8
 
 export const allProblems: Problem[] = Array.from({ length: 10 }, (_, leftIndex) =>
   Array.from({ length: 10 }, (_, rightIndex) => {
@@ -44,11 +50,23 @@ export function updateWeights(
   weights: ProblemWeight,
   problemId: string,
   isCorrect: boolean,
+  responseSeconds = 0,
 ): ProblemWeight {
   const currentWeight = weights[problemId] ?? 1
-  const nextWeight = isCorrect
-    ? currentWeight * CORRECT_MULTIPLIER
-    : currentWeight * WRONG_MULTIPLIER + 0.45
+  let nextWeight: number
+
+  if (!isCorrect) {
+    nextWeight =
+      responseSeconds >= SLOW_SECONDS
+        ? currentWeight * 2.15 + 0.65
+        : currentWeight * 1.85 + 0.45
+  } else if (responseSeconds <= FAST_SECONDS) {
+    nextWeight = currentWeight * 0.55
+  } else if (responseSeconds >= SLOW_SECONDS) {
+    nextWeight = currentWeight * 1.25 + 0.2
+  } else {
+    nextWeight = currentWeight * 0.82
+  }
 
   return {
     ...weights,
@@ -84,8 +102,9 @@ export function chooseNextProblem(
 
 export function createAnswerOptions(
   problem: Problem,
+  previousCorrectIndex?: number,
   random = Math.random,
-): number[] {
+): AnswerOptions {
   const nearbyAnswers = Array.from(
     new Set(
       allProblems
@@ -97,8 +116,17 @@ export function createAnswerOptions(
       Math.abs(first - problem.answer) - Math.abs(second - problem.answer),
   )
 
-  const distractors = pickRandomItems(nearbyAnswers.slice(0, 14), 3, random)
-  return shuffleNumbers([problem.answer, ...distractors], random)
+  const distractors = pickRandomItems(nearbyAnswers.slice(0, 16), 3, random)
+  const correctIndex = chooseCorrectIndex(previousCorrectIndex, random)
+  const shuffledDistractors = shuffleNumbers(distractors, random)
+  const values: number[] = []
+
+  for (let index = 0; index < 4; index += 1) {
+    values[index] =
+      index === correctIndex ? problem.answer : shuffledDistractors.shift() ?? problem.answer
+  }
+
+  return { values, correctIndex }
 }
 
 export function evaluateAnswer(
@@ -106,33 +134,42 @@ export function evaluateAnswer(
   problem: Problem,
   submittedAnswer: number,
   streak: number,
+  responseSeconds = 0,
 ): AnswerResult {
   const isCorrect = submittedAnswer === problem.answer
   const nextStreak = isCorrect ? streak + 1 : 0
 
   if (!isCorrect) {
     return {
-      weights: updateWeights(weights, problem.id, false),
+      weights: updateWeights(weights, problem.id, false, responseSeconds),
       scoreDelta: 0,
-      feedback: `Skoro! ${problem.left} x ${problem.right} je ${problem.answer}.`,
+      feedback: `Pozor, správně je ${problem.answer}.`,
+      isCorrect,
     }
   }
 
   return {
-    weights: updateWeights(weights, problem.id, true),
+    weights: updateWeights(weights, problem.id, true, responseSeconds),
     scoreDelta: 10 + Math.min(20, nextStreak),
     feedback:
       nextStreak >= 20
         ? 'Paráda! 20 správných odpovědí v řadě!'
-        : encouragementFor(nextStreak),
+        : encouragementFor(nextStreak, responseSeconds),
+    isCorrect,
   }
 }
 
-function encouragementFor(streak: number) {
+function encouragementFor(streak: number, responseSeconds: number) {
   if (streak >= 15) return 'Už jsi skoro u velké oslavy!'
   if (streak >= 10) return 'Desítka v řadě, to je jízda!'
+  if (responseSeconds <= FAST_SECONDS) return 'Bleskově správně!'
   if (streak >= 5) return 'Skvělá série, jen tak dál!'
   return 'Správně!'
+}
+
+function chooseCorrectIndex(previousCorrectIndex: number | undefined, random: () => number) {
+  const indexes = [0, 1, 2, 3].filter((index) => index !== previousCorrectIndex)
+  return indexes[Math.floor(random() * indexes.length)]
 }
 
 function pickRandomItems(items: number[], count: number, random: () => number) {
