@@ -22,6 +22,10 @@ export type NewLeaderboardEntry = {
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string | undefined
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined
+const MAX_SCORE = 100000
+const MAX_STREAK = 1000
+const MAX_ANSWERS = 5000
+const MAX_GAME_SECONDS = 86400
 
 export const isLeaderboardConfigured = Boolean(supabaseUrl && supabaseAnonKey)
 
@@ -56,6 +60,21 @@ export async function saveLeaderboardEntry(entry: NewLeaderboardEntry) {
 
   if (nickname.length < 2) {
     throw new Error('Zadej přezdívku alespoň se 2 znaky.')
+  }
+
+  if (
+    entry.score < 0 ||
+    entry.score > MAX_SCORE ||
+    entry.bestStreak < 20 ||
+    entry.bestStreak > MAX_STREAK ||
+    entry.correctAnswers < entry.bestStreak ||
+    entry.correctAnswers > MAX_ANSWERS ||
+    entry.wrongAnswers < 0 ||
+    entry.wrongAnswers > MAX_ANSWERS ||
+    entry.gameSeconds < 0 ||
+    entry.gameSeconds > MAX_GAME_SECONDS
+  ) {
+    throw new Error('Skóre nejde uložit, protože má neplatné hodnoty.')
   }
 
   const { error } = await supabase.from('leaderboard_scores').insert({
