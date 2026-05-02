@@ -14,13 +14,20 @@ describe('game engine', () => {
     expect(allProblems.find((problem) => problem.id === '10x10')?.answer).toBe(100)
   })
 
-  it('reduces weight after a correct answer and raises it after a wrong answer', () => {
+  it('reduces weight after a fast correct answer and raises it after a wrong answer', () => {
     const weights = createInitialWeights()
-    const afterCorrect = updateWeights(weights, '7x8', true)
-    const afterWrong = updateWeights(afterCorrect, '7x8', false)
+    const afterCorrect = updateWeights(weights, '7x8', true, 2)
+    const afterWrong = updateWeights(afterCorrect, '7x8', false, 3)
 
     expect(afterCorrect['7x8']).toBeLessThan(weights['7x8'])
     expect(afterWrong['7x8']).toBeGreaterThan(afterCorrect['7x8'])
+  })
+
+  it('raises weight after a slow answer even when it is correct', () => {
+    const weights = createInitialWeights()
+    const afterSlowCorrect = updateWeights(weights, '6x9', true, 10)
+
+    expect(afterSlowCorrect['6x9']).toBeGreaterThan(weights['6x9'])
   })
 
   it('prefers a high-weight problem when random points to its range', () => {
@@ -36,8 +43,8 @@ describe('game engine', () => {
     const problem = allProblems.find((item) => item.id === '6x7')!
     const weights = createInitialWeights()
 
-    const correct = evaluateAnswer(weights, problem, 42, 4)
-    const wrong = evaluateAnswer(weights, problem, 41, 4)
+    const correct = evaluateAnswer(weights, problem, 42, 4, 5)
+    const wrong = evaluateAnswer(weights, problem, 41, 4, 5)
 
     expect(correct.scoreDelta).toBe(15)
     expect(correct.feedback).toContain('Skv')
@@ -47,10 +54,18 @@ describe('game engine', () => {
 
   it('creates four unique answer options including the correct result', () => {
     const problem = allProblems.find((item) => item.id === '8x9')!
-    const options = createAnswerOptions(problem, () => 0.42)
+    const options = createAnswerOptions(problem, undefined, () => 0.42)
 
-    expect(options).toHaveLength(4)
-    expect(new Set(options).size).toBe(4)
-    expect(options).toContain(72)
+    expect(options.values).toHaveLength(4)
+    expect(new Set(options.values).size).toBe(4)
+    expect(options.values).toContain(72)
+  })
+
+  it('does not place the correct answer on the previous button when possible', () => {
+    const problem = allProblems.find((item) => item.id === '8x9')!
+    const options = createAnswerOptions(problem, 2, () => 0.5)
+
+    expect(options.correctIndex).not.toBe(2)
+    expect(options.values[options.correctIndex]).toBe(72)
   })
 })
