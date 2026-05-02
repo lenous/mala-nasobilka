@@ -13,6 +13,7 @@ Produkční kontrola:
 
 ```bash
 npm test
+npm run lint
 npm run build
 npm run preview
 ```
@@ -36,6 +37,7 @@ create table public.leaderboard_scores (
   best_streak integer not null check (best_streak >= 20),
   correct_answers integer not null check (correct_answers >= 0),
   wrong_answers integer not null check (wrong_answers >= 0),
+  game_seconds integer not null default 0 check (game_seconds >= 0),
   created_at timestamptz not null default now()
 );
 
@@ -57,7 +59,15 @@ with check (
   and best_streak >= 20
   and correct_answers >= best_streak
   and wrong_answers >= 0
+  and game_seconds >= 0
 );
+```
+
+Pokud tabulka už existuje, doplňte sloupec času hry:
+
+```sql
+alter table public.leaderboard_scores
+add column if not exists game_seconds integer not null default 0 check (game_seconds >= 0);
 ```
 
 ## GitHub Pages
