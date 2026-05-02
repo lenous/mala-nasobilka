@@ -1,0 +1,19 @@
+{
+  "name": "Malá násobilka",
+  "short_name": "Násobilka",
+  "description": "Zábavný mobilní trénink malé násobilky pro děti.",
+  "start_url": "/mala-nasobilka/",
+  "scope": "/mala-nasobilka/",
+  "display": "standalone",
+  "background_color": "#fff7df",
+  "theme_color": "#ffd166",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/mala-nasobilka/app-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
