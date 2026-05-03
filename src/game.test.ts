@@ -81,6 +81,26 @@ describe('game engine', () => {
     expect(problems.some((problem) => problem.id === '2x7')).toBe(false)
   })
 
+  it('uses the seven table as examples ending with seven', () => {
+    const problems = getProblemsForMultipliers([7])
+
+    expect(problems).toHaveLength(10)
+    expect(problems.every((problem) => problem.right === 7)).toBe(true)
+    expect(problems.map((problem) => problem.id)).toEqual([
+      '1x7',
+      '2x7',
+      '3x7',
+      '4x7',
+      '5x7',
+      '6x7',
+      '7x7',
+      '8x7',
+      '9x7',
+      '10x7',
+    ])
+    expect(problems.some((problem) => problem.id === '7x2')).toBe(false)
+  })
+
   it('chooses the next problem only from selected multiplication tables', () => {
     const problems = getProblemsForMultipliers([4])
     const weights = createInitialWeights(problems)
