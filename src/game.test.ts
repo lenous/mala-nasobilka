@@ -117,7 +117,7 @@ describe('game engine', () => {
     const correct = evaluateAnswer(weights, problem, 42, 4, 5)
     const wrong = evaluateAnswer(weights, problem, 41, 4, 5)
 
-    expect(correct.scoreDelta).toBe(15)
+    expect(correct.scoreDelta).toBe(12) // 6x7: right=7, streak=5 → 7 + min(14,5) = 12
     expect(correct.feedback).toContain('Skv')
     expect(wrong.scoreDelta).toBe(0)
     expect(wrong.feedback).toContain('42')
