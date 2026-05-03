@@ -286,6 +286,7 @@ function App() {
         correctAnswers: stats.correctAnswers,
         wrongAnswers: stats.wrongAnswers,
         gameSeconds: stats.gameSeconds,
+        multipliers: selectedMultipliers,
       })
       setHasSavedMilestone(true)
       setNickname('')
