@@ -43,10 +43,20 @@ describe('game engine', () => {
   it('filters problems to selected multiplication tables', () => {
     const problems = getProblemsForMultipliers([3, 7])
 
-    expect(problems).toHaveLength(20)
-    expect(problems.every((problem) => problem.left === 3 || problem.left === 7)).toBe(true)
+    expect(problems).toHaveLength(36)
+    expect(
+      problems.every(
+        (problem) =>
+          problem.left === 3 ||
+          problem.left === 7 ||
+          problem.right === 3 ||
+          problem.right === 7,
+      ),
+    ).toBe(true)
     expect(problems.some((problem) => problem.id === '3x10')).toBe(true)
+    expect(problems.some((problem) => problem.id === '10x3')).toBe(true)
     expect(problems.some((problem) => problem.id === '7x8')).toBe(true)
+    expect(problems.some((problem) => problem.id === '8x7')).toBe(true)
   })
 
   it('chooses the next problem only from selected multiplication tables', () => {
@@ -55,7 +65,7 @@ describe('game engine', () => {
 
     const selected = chooseNextProblem(weights, undefined, () => 0.5, problems)
 
-    expect(selected.left).toBe(4)
+    expect(selected.left === 4 || selected.right === 4).toBe(true)
   })
 
   it('scores correct answers and leaves wrong answers without points', () => {
