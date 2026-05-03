@@ -5,6 +5,7 @@ import {
   createAnswerOptions,
   createInitialWeights,
   evaluateAnswer,
+  getProblemsForMultipliers,
   updateWeights,
 } from './game'
 
@@ -37,6 +38,24 @@ describe('game engine', () => {
     const selected = chooseNextProblem(weights, undefined, () => 0.98)
 
     expect(selected.id).toBe('10x10')
+  })
+
+  it('filters problems to selected multiplication tables', () => {
+    const problems = getProblemsForMultipliers([3, 7])
+
+    expect(problems).toHaveLength(20)
+    expect(problems.every((problem) => problem.left === 3 || problem.left === 7)).toBe(true)
+    expect(problems.some((problem) => problem.id === '3x10')).toBe(true)
+    expect(problems.some((problem) => problem.id === '7x8')).toBe(true)
+  })
+
+  it('chooses the next problem only from selected multiplication tables', () => {
+    const problems = getProblemsForMultipliers([4])
+    const weights = createInitialWeights(problems)
+
+    const selected = chooseNextProblem(weights, undefined, () => 0.5, problems)
+
+    expect(selected.left).toBe(4)
   })
 
   it('scores correct answers and leaves wrong answers without points', () => {
