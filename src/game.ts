@@ -41,9 +41,7 @@ export const allProblems: Problem[] = Array.from({ length: 10 }, (_, leftIndex) 
 
 export function getProblemsForMultipliers(multipliers: number[]) {
   const allowed = new Set(multipliers)
-  return allProblems.filter(
-    (problem) => allowed.has(problem.left) && allowed.has(problem.right),
-  )
+  return allProblems.filter((problem) => allowed.has(problem.right))
 }
 
 export function createInitialWeights(problems = allProblems): ProblemWeight {
