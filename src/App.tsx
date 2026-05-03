@@ -13,6 +13,7 @@ import {
   createAnswerOptions,
   createInitialWeights,
   evaluateAnswer,
+  getProblemsForMultipliers,
 } from './game'
 import type { AnswerOptions, Problem, ProblemWeight } from './game'
 import {
@@ -42,15 +43,24 @@ type AnswerState = {
 const STORAGE_KEY = 'mala-nasobilka-state-v2'
 const CELEBRATION_STREAK = 20
 const NEXT_PROBLEM_DELAY_MS = 850
+const DEFAULT_MULTIPLIERS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
 function App() {
   const savedState = useMemo(readSavedState, [])
+  const initialMultipliers = savedState?.selectedMultipliers ?? DEFAULT_MULTIPLIERS
+  const initialProblems = getProblemsForMultipliers(initialMultipliers)
   const [view, setView] = useState<View>('home')
+  const [selectedMultipliers, setSelectedMultipliers] = useState(initialMultipliers)
   const [weights, setWeights] = useState<ProblemWeight>(
-    savedState?.weights ?? createInitialWeights(),
+    savedState?.weights ?? createInitialWeights(initialProblems),
   )
   const [problem, setProblem] = useState<Problem>(() =>
-    chooseNextProblem(savedState?.weights ?? createInitialWeights()),
+    chooseNextProblem(
+      savedState?.weights ?? createInitialWeights(initialProblems),
+      undefined,
+      Math.random,
+      initialProblems,
+    ),
   )
   const [answerOptions, setAnswerOptions] = useState<AnswerOptions>(() =>
     createAnswerOptions(problem),
@@ -80,6 +90,10 @@ function App() {
   const progress = Math.min(100, (stats.streak / CELEBRATION_STREAK) * 100)
   const showScoreForm = stats.bestStreak >= CELEBRATION_STREAK
   const canCelebrate = stats.bestStreak >= CELEBRATION_STREAK
+  const activeProblems = useMemo(
+    () => getProblemsForMultipliers(selectedMultipliers),
+    [selectedMultipliers],
+  )
 
   useEffect(() => {
     localStorage.setItem(
@@ -87,9 +101,10 @@ function App() {
       JSON.stringify({
         weights,
         stats,
+        selectedMultipliers,
       }),
     )
-  }, [stats, weights])
+  }, [selectedMultipliers, stats, weights])
 
   useEffect(() => {
     refreshLeaderboard()
@@ -122,8 +137,8 @@ function App() {
   })
 
   function startNewGame() {
-    const nextWeights = createInitialWeights()
-    const nextProblem = chooseNextProblem(nextWeights)
+    const nextWeights = createInitialWeights(activeProblems)
+    const nextProblem = chooseNextProblem(nextWeights, undefined, Math.random, activeProblems)
 
     setWeights(nextWeights)
     setProblem(nextProblem)
@@ -144,6 +159,20 @@ function App() {
     setHasSavedMilestone(false)
     setCelebrationOpen(false)
     setView('game')
+  }
+
+  function toggleMultiplier(multiplier: number) {
+    setSelectedMultipliers((current) => {
+      if (current.includes(multiplier)) {
+        return current.length === 1 ? current : current.filter((item) => item !== multiplier)
+      }
+
+      return [...current, multiplier].sort((first, second) => first - second)
+    })
+  }
+
+  function selectAllMultipliers() {
+    setSelectedMultipliers(DEFAULT_MULTIPLIERS)
   }
 
   function submitAnswer(submittedAnswer: number) {
@@ -182,7 +211,12 @@ function App() {
     const currentCorrectIndex = answerOptions.correctIndex
 
     window.setTimeout(() => {
-      const nextProblem = chooseNextProblem(result.weights, problem.id)
+      const nextProblem = chooseNextProblem(
+        result.weights,
+        problem.id,
+        Math.random,
+        activeProblems,
+      )
       setProblem(nextProblem)
       setAnswerOptions(createAnswerOptions(nextProblem, currentCorrectIndex))
       setAnswerState(null)
@@ -271,6 +305,9 @@ function App() {
           bestStreak={stats.bestStreak}
           onShowLeaderboard={() => setView('leaderboard')}
           onStartGame={startNewGame}
+          onToggleMultiplier={toggleMultiplier}
+          onSelectAllMultipliers={selectAllMultipliers}
+          selectedMultipliers={selectedMultipliers}
         />
       ) : null}
 
@@ -291,6 +328,7 @@ function App() {
           onSubmitAnswer={submitAnswer}
           problem={problem}
           progress={progress}
+          selectedMultipliers={selectedMultipliers}
           stats={stats}
         />
       ) : null}
@@ -341,13 +379,24 @@ function App() {
 
 function HomeScreen({
   bestStreak,
+  onSelectAllMultipliers,
   onShowLeaderboard,
   onStartGame,
+  onToggleMultiplier,
+  selectedMultipliers,
 }: {
   bestStreak: number
+  onSelectAllMultipliers: () => void
   onShowLeaderboard: () => void
   onStartGame: () => void
+  onToggleMultiplier: (multiplier: number) => void
+  selectedMultipliers: number[]
 }) {
+  const selectionLabel =
+    selectedMultipliers.length === DEFAULT_MULTIPLIERS.length
+      ? 'všechny násobilky'
+      : selectedMultipliers.map((item) => `${item}x`).join(', ')
+
   return (
     <section className="welcome-screen" aria-labelledby="welcome-title">
       <div className="welcome-card">
@@ -361,6 +410,32 @@ function HomeScreen({
         <p className="welcome-copy">
           Nasbírej 20 správných odpovědí v řadě a zapiš se do tabulky hráčů.
         </p>
+        <div className="multiplier-picker" aria-label="Výběr násobilek">
+          <div className="picker-heading">
+            <span>Procvičovat</span>
+            <button type="button" onClick={onSelectAllMultipliers}>
+              Vše
+            </button>
+          </div>
+          <div className="multiplier-grid">
+            {DEFAULT_MULTIPLIERS.map((multiplier) => {
+              const isSelected = selectedMultipliers.includes(multiplier)
+
+              return (
+                <button
+                  key={multiplier}
+                  type="button"
+                  aria-pressed={isSelected}
+                  className={isSelected ? 'selected' : ''}
+                  onClick={() => onToggleMultiplier(multiplier)}
+                >
+                  {multiplier}
+                </button>
+              )
+            })}
+          </div>
+          <p>{selectionLabel}</p>
+        </div>
         <div className="welcome-actions">
           <button type="button" className="primary-button" onClick={onStartGame}>
             <Play size={22} />
@@ -390,6 +465,7 @@ function GameScreen({
   onSubmitAnswer,
   problem,
   progress,
+  selectedMultipliers,
   stats,
 }: {
   answerOptions: AnswerOptions
@@ -404,6 +480,7 @@ function GameScreen({
   onSubmitAnswer: (answer: number) => void
   problem: Problem
   progress: number
+  selectedMultipliers: number[]
   stats: GameStats
 }) {
   return (
@@ -425,6 +502,11 @@ function GameScreen({
           <StatTile label="Série" value={stats.streak} />
           <StatTile label="Čas" value={formatTime(stats.gameSeconds)} />
         </div>
+        <p className="active-tables">
+          {selectedMultipliers.length === DEFAULT_MULTIPLIERS.length
+            ? 'Hraješ všechny násobilky'
+            : `Hraješ násobilku ${selectedMultipliers.map((item) => `${item}x`).join(', ')}`}
+        </p>
 
         <div className="progress-wrap">
           <div className="progress-label">
@@ -620,14 +702,21 @@ function formatTime(totalSeconds: number) {
 }
 
 function readSavedState():
-  | { weights: ProblemWeight; stats: GameStats }
+  | { weights: ProblemWeight; stats: GameStats; selectedMultipliers?: number[] }
   | null {
   try {
     const saved = localStorage.getItem(STORAGE_KEY)
     if (!saved) return null
 
-    const parsed = JSON.parse(saved) as { weights: ProblemWeight; stats: Partial<GameStats> }
+    const parsed = JSON.parse(saved) as {
+      selectedMultipliers?: number[]
+      weights: ProblemWeight
+      stats: Partial<GameStats>
+    }
+    const selectedMultipliers = normalizeMultipliers(parsed.selectedMultipliers)
+
     return {
+      selectedMultipliers,
       weights: parsed.weights,
       stats: {
         score: parsed.stats.score ?? 0,
@@ -641,6 +730,16 @@ function readSavedState():
   } catch {
     return null
   }
+}
+
+function normalizeMultipliers(multipliers: number[] | undefined) {
+  if (!multipliers) return DEFAULT_MULTIPLIERS
+
+  const normalized = Array.from(
+    new Set(multipliers.filter((item) => Number.isInteger(item) && item >= 1 && item <= 10)),
+  ).sort((first, second) => first - second)
+
+  return normalized.length > 0 ? normalized : DEFAULT_MULTIPLIERS
 }
 
 export default App
