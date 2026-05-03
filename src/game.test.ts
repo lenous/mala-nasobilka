@@ -43,25 +43,42 @@ describe('game engine', () => {
   it('filters problems to selected multiplication tables', () => {
     const problems = getProblemsForMultipliers([3, 7])
 
-    expect(problems).toHaveLength(4)
-    expect(
-      problems.every(
-        (problem) => [3, 7].includes(problem.left) && [3, 7].includes(problem.right),
-      ),
-    ).toBe(true)
+    expect(problems).toHaveLength(20)
+    expect(problems.every((problem) => [3, 7].includes(problem.right))).toBe(true)
     expect(problems.some((problem) => problem.id === '3x10')).toBe(false)
-    expect(problems.some((problem) => problem.id === '10x3')).toBe(false)
+    expect(problems.some((problem) => problem.id === '10x3')).toBe(true)
     expect(problems.some((problem) => problem.id === '7x8')).toBe(false)
-    expect(problems.some((problem) => problem.id === '8x7')).toBe(false)
+    expect(problems.some((problem) => problem.id === '8x7')).toBe(true)
   })
 
-  it('keeps both factors inside the selected number range', () => {
+  it('keeps the right factor inside the selected number range', () => {
     const problems = getProblemsForMultipliers([1, 2, 3, 4])
 
-    expect(problems).toHaveLength(16)
-    expect(problems.every((problem) => problem.left <= 4 && problem.right <= 4)).toBe(true)
+    expect(problems).toHaveLength(40)
+    expect(problems.every((problem) => problem.right <= 4)).toBe(true)
     expect(problems.some((problem) => problem.id === '2x7')).toBe(false)
+    expect(problems.some((problem) => problem.id === '7x2')).toBe(true)
     expect(problems.some((problem) => problem.id === '4x4')).toBe(true)
+  })
+
+  it('uses a single selected table as the right operand', () => {
+    const problems = getProblemsForMultipliers([2])
+
+    expect(problems).toHaveLength(10)
+    expect(problems.every((problem) => problem.right === 2)).toBe(true)
+    expect(problems.map((problem) => problem.id)).toEqual([
+      '1x2',
+      '2x2',
+      '3x2',
+      '4x2',
+      '5x2',
+      '6x2',
+      '7x2',
+      '8x2',
+      '9x2',
+      '10x2',
+    ])
+    expect(problems.some((problem) => problem.id === '2x7')).toBe(false)
   })
 
   it('chooses the next problem only from selected multiplication tables', () => {
@@ -70,7 +87,6 @@ describe('game engine', () => {
 
     const selected = chooseNextProblem(weights, undefined, () => 0.5, problems)
 
-    expect(selected.left).toBe(4)
     expect(selected.right).toBe(4)
   })
 
