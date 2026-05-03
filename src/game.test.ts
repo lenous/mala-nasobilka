@@ -43,20 +43,25 @@ describe('game engine', () => {
   it('filters problems to selected multiplication tables', () => {
     const problems = getProblemsForMultipliers([3, 7])
 
-    expect(problems).toHaveLength(36)
+    expect(problems).toHaveLength(4)
     expect(
       problems.every(
-        (problem) =>
-          problem.left === 3 ||
-          problem.left === 7 ||
-          problem.right === 3 ||
-          problem.right === 7,
+        (problem) => [3, 7].includes(problem.left) && [3, 7].includes(problem.right),
       ),
     ).toBe(true)
-    expect(problems.some((problem) => problem.id === '3x10')).toBe(true)
-    expect(problems.some((problem) => problem.id === '10x3')).toBe(true)
-    expect(problems.some((problem) => problem.id === '7x8')).toBe(true)
-    expect(problems.some((problem) => problem.id === '8x7')).toBe(true)
+    expect(problems.some((problem) => problem.id === '3x10')).toBe(false)
+    expect(problems.some((problem) => problem.id === '10x3')).toBe(false)
+    expect(problems.some((problem) => problem.id === '7x8')).toBe(false)
+    expect(problems.some((problem) => problem.id === '8x7')).toBe(false)
+  })
+
+  it('keeps both factors inside the selected number range', () => {
+    const problems = getProblemsForMultipliers([1, 2, 3, 4])
+
+    expect(problems).toHaveLength(16)
+    expect(problems.every((problem) => problem.left <= 4 && problem.right <= 4)).toBe(true)
+    expect(problems.some((problem) => problem.id === '2x7')).toBe(false)
+    expect(problems.some((problem) => problem.id === '4x4')).toBe(true)
   })
 
   it('chooses the next problem only from selected multiplication tables', () => {
@@ -65,7 +70,8 @@ describe('game engine', () => {
 
     const selected = chooseNextProblem(weights, undefined, () => 0.5, problems)
 
-    expect(selected.left === 4 || selected.right === 4).toBe(true)
+    expect(selected.left).toBe(4)
+    expect(selected.right).toBe(4)
   })
 
   it('scores correct answers and leaves wrong answers without points', () => {
