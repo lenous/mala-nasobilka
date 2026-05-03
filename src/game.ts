@@ -157,7 +157,7 @@ export function evaluateAnswer(
 
   return {
     weights: updateWeights(weights, problem.id, true, responseSeconds),
-    scoreDelta: 10 + Math.min(20, nextStreak),
+    scoreDelta: problem.right + Math.min(problem.right * 2, nextStreak),
     feedback:
       nextStreak >= 20
         ? 'Paráda! 20 správných odpovědí v řadě!'
