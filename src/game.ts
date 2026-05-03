@@ -23,6 +23,7 @@ const MIN_WEIGHT = 0.3
 const MAX_WEIGHT = 9
 const FAST_SECONDS = 4
 const SLOW_SECONDS = 8
+export const allMultipliers = Array.from({ length: 10 }, (_, index) => index + 1)
 
 export const allProblems: Problem[] = Array.from({ length: 10 }, (_, leftIndex) =>
   Array.from({ length: 10 }, (_, rightIndex) => {
@@ -38,8 +39,13 @@ export const allProblems: Problem[] = Array.from({ length: 10 }, (_, leftIndex) 
   }),
 ).flat()
 
-export function createInitialWeights(): ProblemWeight {
-  return Object.fromEntries(allProblems.map((problem) => [problem.id, 1]))
+export function getProblemsForMultipliers(multipliers: number[]) {
+  const allowed = new Set(multipliers)
+  return allProblems.filter((problem) => allowed.has(problem.left))
+}
+
+export function createInitialWeights(problems = allProblems): ProblemWeight {
+  return Object.fromEntries(problems.map((problem) => [problem.id, 1]))
 }
 
 export function clampWeight(weight: number) {
@@ -78,11 +84,12 @@ export function chooseNextProblem(
   weights: ProblemWeight,
   previousProblemId?: string,
   random = Math.random,
+  problems = allProblems,
 ): Problem {
   const candidates =
-    allProblems.length > 1
-      ? allProblems.filter((problem) => problem.id !== previousProblemId)
-      : allProblems
+    problems.length > 1
+      ? problems.filter((problem) => problem.id !== previousProblemId)
+      : problems
 
   const totalWeight = candidates.reduce(
     (sum, problem) => sum + (weights[problem.id] ?? 1),
@@ -97,7 +104,7 @@ export function chooseNextProblem(
     }
   }
 
-  return candidates[candidates.length - 1]
+  return candidates[candidates.length - 1] ?? allProblems[0]
 }
 
 export function createAnswerOptions(
