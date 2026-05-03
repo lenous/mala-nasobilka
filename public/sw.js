@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mala-nasobilka-v7'
+const CACHE_NAME = 'mala-nasobilka-v8'
 const BASE = '/mala-nasobilka/'
 const ASSETS = [BASE, `${BASE}manifest.webmanifest`, `${BASE}app-icon.svg`]
 
