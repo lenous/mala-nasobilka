@@ -2,6 +2,8 @@
 
 Mobilní PWA aplikace pro děti 7-10 let na procvičení malé násobilky. Aplikace sama vyhodnocuje odpovědi, upravuje četnost příkladů podle úspěšnosti, počítá skóre a po 20 správných odpovědích v řadě odemkne oslavu i zápis do tabulky skóre.
 
+Na úvodní obrazovce lze vybrat jednu nebo více násobilek `1` až `10`. Hra potom míchá jen příklady z vybraných násobilek, například po výběru `7` nabízí jen `7 x 1` až `7 x 10`.
+
 ## Lokální spuštění
 
 ```bash
