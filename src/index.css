@@ -165,6 +165,66 @@ h2 {
   line-height: 1.35;
 }
 
+.multiplier-picker {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 16px;
+  padding: 10px;
+  border: 2px solid #16213a;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.74);
+}
+
+.picker-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #24324f;
+  font-weight: 1000;
+}
+
+.picker-heading button {
+  min-height: 32px;
+  padding: 0 12px;
+  border: 2px solid #16213a;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #16213a;
+  font-size: 0.86rem;
+  font-weight: 1000;
+  box-shadow: 0 3px 0 #16213a;
+}
+
+.multiplier-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.multiplier-grid button {
+  display: grid;
+  place-items: center;
+  min-height: 42px;
+  border: 2px solid #16213a;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #16213a;
+  font-weight: 1000;
+  box-shadow: 0 3px 0 #16213a;
+}
+
+.multiplier-grid button.selected {
+  background: #00b8a9;
+  color: #ffffff;
+}
+
+.multiplier-picker p {
+  margin: 0;
+  color: #526070;
+  font-size: 0.84rem;
+  font-weight: 900;
+}
+
 .welcome-actions,
 .celebration-actions {
   display: grid;
@@ -233,6 +293,18 @@ h2 {
   grid-template-columns: repeat(3, 1fr);
   gap: 7px;
   margin-bottom: 10px;
+}
+
+.active-tables {
+  margin: 0 0 10px;
+  padding: 8px 10px;
+  border: 2px solid #16213a;
+  border-radius: 8px;
+  background: #e9fbff;
+  color: #24324f;
+  font-size: 0.88rem;
+  font-weight: 1000;
+  text-align: center;
 }
 
 .stat-tile {
@@ -381,6 +453,8 @@ h2 {
 
 .primary-button:active,
 .ghost-button:active,
+.picker-heading button:active,
+.multiplier-grid button:active,
 .top-nav button:active,
 .answer-options button:active,
 .secondary-button:active,
